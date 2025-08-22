@@ -7,8 +7,8 @@ module.exports = {
   name: 'apply',
   description: 'Post application panel',
   async execute(client, message, args) {
-    if (!message.member.permissions.has('Administrator')) return message.reply({ content: 'No permission.', ephemeral: true });
-    if (args.length === 0) return message.reply({ content: 'Specify sections to enable, or "all".', ephemeral: true });
+  if (!message.member.permissions.has('Administrator')) return message.reply({ content: 'No permission.' });
+  if (args.length === 0) return message.reply({ content: 'Specify sections to enable, or "all".' });
 
     const allSections = utils.listSections();
     let enabled = [];
@@ -40,7 +40,7 @@ module.exports = {
 
     if (!enabled.length) {
       console.error('apply: no enabled sections found for args', args, 'allSections=', allSections);
-      return message.reply({ content: 'No matching sections found for the provided names.', ephemeral: true });
+  return message.reply({ content: 'No matching sections found for the provided names.' });
     }
 
     // build buttons and applys list
@@ -55,7 +55,10 @@ module.exports = {
         // only use unicode emoji strings; skip custom emojis to avoid cross-guild issues
         try {
           const parsed = utils.parseEmoji(sec.emoji || '');
-          if (parsed && utils.isEmojiAccessible(parsed, message.guild)) btn.setEmoji(parsed);
+          // only set button emoji for custom guild emojis (objects). For unicode emoji use the label text
+          if (parsed && typeof parsed === 'object' && utils.isEmojiAccessible(parsed, message.guild)) {
+            try { btn.setEmoji(parsed); } catch (e) { console.warn('apply: setEmoji failed', e && e.message); }
+          }
         } catch (e) { console.warn('apply: setEmoji failed', e && e.message); }
         buttonsRow.addComponents(btn);
     }
@@ -77,7 +80,7 @@ module.exports = {
         console.log('apply: send success, messageId=', sent.id);
       } catch (err) {
         console.error('Failed to send apply panel', err);
-        return message.reply({ content: 'Failed to post application panel (invalid emoji or components).', ephemeral: true });
+  return message.reply({ content: 'Failed to post application panel (invalid emoji or components).' });
       }
   // register only the enabled section keys (so auto-refresh can rebuild correctly)
   utils.registerPanel('apply', sent.channel.id, sent.id, { enabled });

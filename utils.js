@@ -58,17 +58,44 @@ function deleteSection(name) {
 
 function loadPanels() {
   try {
-    if (!fs.existsSync(panelsFile)) return [];
-    return fs.readJsonSync(panelsFile);
+    if (!fs.existsSync(panelsFile)) return { apply: [], ahelp: [], mainMessage: '' };
+    const raw = fs.readJsonSync(panelsFile);
+    // support both legacy array shape and object shape
+    if (Array.isArray(raw)) {
+      const obj = { apply: [], ahelp: [], mainMessage: '' };
+      for (const p of raw) {
+        if (p && p.type && (p.type === 'apply' || p.type === 'ahelp')) {
+          obj[p.type].push({ channelId: p.channelId, messageId: p.messageId, meta: p.meta || {} });
+        }
+      }
+      return obj;
+    }
+    // if object, ensure expected keys exist
+    raw.apply = raw.apply || [];
+    raw.ahelp = raw.ahelp || [];
+    raw.mainMessage = raw.mainMessage || '';
+    return raw;
   } catch (e) {
     console.error('loadPanels error', e && e.message);
-    return [];
+    return { apply: [], ahelp: [], mainMessage: '' };
   }
 }
 
 function savePanels(panels) {
   try {
-    fs.writeJsonSync(panelsFile, panels, { spaces: 2 });
+    // normalize to object shape
+    const out = { apply: [], ahelp: [], mainMessage: '' };
+    if (Array.isArray(panels)) {
+      for (const p of panels) {
+        if (!p || !p.type) continue;
+        if (p.type === 'apply' || p.type === 'ahelp') out[p.type].push({ channelId: p.channelId, messageId: p.messageId, meta: p.meta || {} });
+      }
+    } else if (typeof panels === 'object' && panels !== null) {
+      out.apply = panels.apply || [];
+      out.ahelp = panels.ahelp || [];
+      out.mainMessage = panels.mainMessage || '';
+    }
+    fs.writeJsonSync(panelsFile, out, { spaces: 2 });
   } catch (e) {
     console.error('savePanels error', e && e.message);
     throw e;
@@ -77,29 +104,31 @@ function savePanels(panels) {
 
 function registerPanel(type, channelId, messageId, meta) {
   const panels = loadPanels();
-  panels.push({ type, channelId, messageId, meta: meta || {} });
+  if (!panels[type]) panels[type] = [];
+  // avoid duplicates by messageId
+  if (!panels[type].some(p => p.messageId === messageId)) {
+    panels[type].push({ channelId, messageId, meta: meta || {} });
+  }
   savePanels(panels);
 }
 
 function unregisterPanelByMessage(channelId, messageId) {
-  const panels = loadPanels().filter(p => !(p.channelId === channelId && p.messageId === messageId));
+  const panels = loadPanels();
+  for (const k of Object.keys(panels)) {
+    if (!Array.isArray(panels[k])) continue;
+    panels[k] = panels[k].filter(p => !(p.channelId === channelId && p.messageId === messageId));
+  }
   savePanels(panels);
 }
 
 function getMainMessage() {
-  const p = loadPanels().find(x => x.type === 'apply' && x.meta && x.meta.mainMessage);
-  return p && p.meta && p.meta.mainMessage;
+  const p = loadPanels();
+  return (p && p.mainMessage) ? p.mainMessage : null;
 }
 
 function setMainMessage(text) {
   const panels = loadPanels();
-  let p = panels.find(x => x.type === 'apply');
-  if (!p) {
-    p = { type: 'apply', channelId: null, messageId: null, meta: {} };
-    panels.push(p);
-  }
-  p.meta = p.meta || {};
-  p.meta.mainMessage = text;
+  panels.mainMessage = text || '';
   savePanels(panels);
 }
 

@@ -51,7 +51,8 @@ client.on('messageCreate', async message => {
     await cmd.execute(client, message, args, config);
   } catch (err) {
     console.error(err);
-    message.reply({ content: 'An error occurred while running that command.', ephemeral: true });
+  // ephemeral is only valid for interactions; use a normal reply for prefix commands
+  message.reply({ content: 'An error occurred while running that command.' });
   }
 });
 
@@ -67,8 +68,11 @@ client.on('interactionCreate', async interaction => {
   }
 });
 
-// login: prefer a hardcoded token if provided, otherwise fall back to the BOT_TOKEN env var.
-// NOTE: Do NOT commit your real token to source control if this repository is public.
-// To use a hardcoded token (not recommended), paste it below between the quotes.
-// It's safer to export BOT_TOKEN in your environment instead of committing a token here.
-client.login('MTM3NTU4Mzk2MTY3NzU2NjAwMg.Gc5Kdx.clJ6w1Q2QtLRlynO5fAYUATORUiVNz_xX7Hr3U');
+// login: read token from the BOT_TOKEN environment variable. Do NOT commit real tokens.
+// Example (bash): export BOT_TOKEN="your_token_here"
+const token = process.env.BOT_TOKEN || '';
+if (!token) {
+  console.warn('BOT_TOKEN is not set in environment; skipping client.login()');
+} else {
+  client.login(token).catch(err => console.error('Failed to login:', err));
+}
