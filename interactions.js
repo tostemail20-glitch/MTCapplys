@@ -29,9 +29,9 @@ function startAutoRefresh(client) {
           buttons.push(`${sec.emoji || ''} ${sec.name || s}`);
           const btn = new ButtonBuilder().setCustomId(`apply_button:${s}:0`).setLabel(sec.name||s).setStyle(ButtonStyle.Primary);
           const emojiToSet = utils.parseEmoji(sec.emoji);
-          // use the channel's guild to check emoji accessibility
+          // only set emoji for custom emoji objects; unicode emoji is shown in the label
           const guild = ch && ch.guild ? ch.guild : null;
-          if (emojiToSet && utils.isEmojiAccessible(emojiToSet, guild)) {
+          if (emojiToSet && typeof emojiToSet === 'object' && utils.isEmojiAccessible(emojiToSet, guild)) {
             try { btn.setEmoji(emojiToSet); } catch(e){}
           }
           row.addComponents(btn);

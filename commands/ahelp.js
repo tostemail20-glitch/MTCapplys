@@ -5,7 +5,7 @@ module.exports = {
   name: 'ahelp',
   description: 'Application system helper panel',
   async execute(client, message) {
-    if (!message.member.permissions.has('Administrator')) return message.reply({ content: 'No permission.', ephemeral: true });
+  if (!message.member.permissions.has('Administrator')) return message.reply({ content: 'No permission.' });
 
     const sections = utils.listSections();
     const counts = sections.map(s=> {
@@ -32,6 +32,6 @@ module.exports = {
 
     const sent = await message.channel.send({ embeds: [embed], components: [row] });
     utils.registerPanel('ahelp', sent.channel.id, sent.id, {});
-    await message.reply({ content: 'ahelp panel sent.', ephemeral: true });
+  await message.reply({ content: 'ahelp panel sent.' });
   }
 };

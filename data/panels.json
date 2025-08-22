@@ -183,6 +183,47 @@
           "Staff Team"
         ]
       }
+    },
+    {
+      "channelId": "1405673731652714576",
+      "messageId": "1408438014639739003",
+      "meta": {
+        "enabled": [
+          "Staff Team"
+        ]
+      }
+    },
+    {
+      "channelId": "1405673731652714576",
+      "messageId": "1408438072600957029",
+      "meta": {
+        "enabled": [
+          "Cinema Team",
+          "Event Crew"
+        ]
+      }
+    },
+    {
+      "channelId": "1405673731652714576",
+      "messageId": "1408439520952717464",
+      "meta": {
+        "enabled": [
+          "Matches Organizer"
+        ]
+      }
+    },
+    {
+      "channelId": "1405673731652714576",
+      "messageId": "1408439538652811304",
+      "meta": {
+        "enabled": [
+          "Cinema Team",
+          "Event Crew",
+          "Matches Organizer",
+          "Media Team",
+          "Staff Team"
+        ]
+      }
     }
   ],
   "ahelp": [
