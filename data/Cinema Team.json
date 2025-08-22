@@ -1,0 +1,22 @@
+{
+  "name": "Cinema Team",
+  "key": "Cinema Team",
+  "emoji": "<:MTC12:1385223315169349652>",
+  "channel": "1408138712897814578",
+  "reviewerRoles": [
+    "1405102895778500668"
+  ],
+  "approvedRoles": [
+    "1408139137986334874"
+  ],
+  "questions": [
+    "اسمك / عمرك ؟",
+    "دولة السكن ؟",
+    "سرعة النت ؟",
+    "نوع الجهاز الي تستخدمه ؟"
+  ],
+  "open": true,
+  "applications": [
+  ],
+  "blacklist": []
+}
